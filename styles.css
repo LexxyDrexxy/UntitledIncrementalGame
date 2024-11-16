@@ -32,6 +32,10 @@ body {background-color: #1b1e23}
     background-color: #6c00b8;
     padding: 10px 27px;
 }
+.painting-button {
+    background-color: #95004f;
+    padding: 10px 27px;
+}
 
 .main-button:hover {
     background-color: cadetblue;
@@ -52,6 +56,10 @@ body {background-color: #1b1e23}
 .altar-button:hover {
     background-color: #46007a;
     color: #c691ff;
+}
+.painting-button:hover {
+    background-color: #470023;
+    color: #ff51ad;
 }
 
 .main-text-mono {

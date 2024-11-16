@@ -7,35 +7,56 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
+    <!-- Always visible text -->
     <p id="shapes-text" class="main-text-mono">Shapes: 0</p>
     <p id="gilded-shapes-text" class="main-text-mono">Gilded Shapes: 0</p>
+
+    <!-- Main game div -->
     <div id="main-game">
-    <button onclick="increaseShapes()" class="button main-button" id="main-button">Generate Shapes</button>
-    <br>
-    <button onclick="buyShopItem(0)" class="button other-button">Increase shapes per click by 1</button>
-    <p id="shop-0-cost" class="main-text-mono">Cost: 10 shapes</p>
-    <button onclick="buyShopItem(1)" class="button other-button">Increase efficiency by 1</button>
-    <p id="shop-1-cost" class="main-text-mono">Cost: 100 shapes</p>
-    <button onclick="buyShopItem(2)" class="button other-button">Increase ticks per click by 2</button>
-    <p id="shop-2-cost" class="main-text-mono">Cost: 1500 shapes</p>
-    <button onclick="prestige()" class="button shiny-button" id="prestige-button">Prestige (requires 10000 shapes)</button>
-    <br>
-    <button onclick="toggleAltar()" class="button altar-button" id="altar-button">Altar (requires 10 Gilded Shapes)</button>
+        <button onclick="increaseShapes()" class="button main-button" id="main-button">Generate Shapes</button>
+        <br>
+        <button onclick="buyShopItem(0)" class="button other-button">Increase shapes per click by 1</button>
+        <p id="shop-0-cost" class="main-text-mono">Cost: 10 shapes</p>
+        <button onclick="buyShopItem(1)" class="button other-button">Increase efficiency by 1</button>
+        <p id="shop-1-cost" class="main-text-mono">Cost: 100 shapes</p>
+        <button onclick="buyShopItem(2)" class="button other-button">Increase ticks per click by 2</button>
+        <p id="shop-2-cost" class="main-text-mono">Cost: 1500 shapes</p>
+        <button onclick="prestige()" class="button shiny-button" id="prestige-button">Prestige (requires 10000 shapes)</button>
+        <br>
+        <button onclick="toggleAltar()" class="button altar-button" id="altar-button">Altar (requires 10 Gilded Shapes)</button>
+        <br>
+        <button onclick="togglePainting()" class="button other-button" id="painting-button">Painting (required 5 total prestige)</button>
+        <br><br>
     </div>
+
+    <!-- Altar div -->
     <div id="altar">
-    <p id="astral-shapes-text" class="main-text-mono">Astral Shapes: 0</p>
-    <p id="astral-shapes-available-text" class="main-text-mono">Astral Shapes Available: 0</p>
-    <button onclick="toggleAltar()" class="button other-button">Back</button>
-    <br>
-    <button onclick="convertShapes('gilded')" class="button shiny-button">Convert Gilded Shapes to Astral Shapes</button>
-    <br>
-    <button onclick="convertShapes('astral')" class="button altar-button">Convert Astral Shapes to Gilded Shapes</button>
-    <br>
-    <button onclick="allocateAstralShapes(0)" class="button altar-button">Golden Ritual</button>
-    <p class="main-text-mono">Allocated Astral Shapes in this spell give a 5% boost to Gilded Shapes' Shape boost.</p>
-    <button onclick="allocateAstralShapes(1)" class="button altar-button">Gifted Rebirth</button>
-    <p class="main-text-mono">Allocated Astral Shapes in this spell give a 3% boost to Gilded Shape gain.</p>
+        <p id="astral-shapes-text" class="main-text-mono">Astral Shapes: 0</p>
+        <p id="astral-shapes-available-text" class="main-text-mono">Astral Shapes Available: 0</p>
+        <button onclick="toggleAltar()" class="button other-button">Back</button>
+        <br><br>
+        <button onclick="convertShapes('gilded')" class="button shiny-button">Convert Gilded Shapes to Astral Shapes</button>
+        <br>
+        <button onclick="convertShapes('astral')" class="button altar-button">Convert Astral Shapes to Gilded Shapes</button>
+        <br>
+        <button onclick="allocateAstralShapes(0)" class="button altar-button">Golden Ritual</button>
+        <p class="main-text-mono">Allocated Astral Shapes in this spell give a 5% boost to Gilded Shapes' Shape boost.</p>
+        <button onclick="allocateAstralShapes(1)" class="button altar-button">Gifted Rebirth</button>
+        <p class="main-text-mono">Allocated Astral Shapes in this spell give a 3% boost to Gilded Shape gain.</p>
+        <button onclick="allocateAstralShapes(2)" class="button altar-button">Astral Prestige</button>
+        <p class="main-text-mono">On prestige, gain Astral Shapes equal to 2% of Gilded Shape gain for each Astral Shape allocated in this spell.</p>
     </div>
+
+    <!-- Painting div -->
+    <div id="paint">
+        <button onclick="togglePainting()" class="button other-button">Back</button>
+        <br><br>
+        <button onclick="paintShapes(0)" class="button painting-button">Paint a Tier I Shape</button>
+        <br>
+        <img src="images/tier 1 painted shapes.png" alt="Tier I Painted Shapes. 33% chance for a Red Shape, 33% chance for a Blue Shape, 33% chance for a Yellow Shape, 1% chance for a Golden Shape.">
+    </div>
+
+    <!-- Help and links (always visible) -->
     <button onclick="toggleStats()" class="button other-button">Statistics</button>
     <button onclick="toggleHelp()" class="button other-button">Help</button>
     <p id="stats-text" class="main-text-mono"></p>
