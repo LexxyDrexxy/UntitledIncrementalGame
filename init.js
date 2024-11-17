@@ -20,6 +20,10 @@ let game = {
         shapesPerClick: 1,
         ticksPerClick: 1,
         efficiency: 0,
+        overclocked: false,
+        overclockBoost: 1.5,
+        canOverclock: true,
+        overclockTimer: 0,
     },
     prestige: {
         prestigeMin: 10_000,
@@ -30,7 +34,7 @@ let game = {
     },
     shop: {
         costs: [10, 100, 1_500, 100_000, 25_000_000, 1_000_000_000],
-        isExpensiveCost: [false, true, false, undefined, undefined, undefined],
+        isExpensiveCost: [false, true, false, true, undefined, undefined],
         costIncrease: 2,
         costIncreaseExpensive: 3,
     },
@@ -48,10 +52,18 @@ let game = {
         paintingUnlocked: false,
         tierCosts: [100_000],
     },
+    achievements: {
+        names: ["It has to start somewhere", "Most generic idle game mechanic"],
+        descriptions: ["Gain 100 shapes.", "Prestige for the first time."],
+        buttons: [],
+        achievementsOpen: false,
+    },
     divs: {
         mainDiv: document.getElementById("main-game"),
         altarDiv: document.getElementById("altar"),
         paintingDiv: document.getElementById("paint"),
+        achievementDiv: document.getElementById("achievement-text"),
+        achievementButtonDiv: document.getElementById("achievements"),
     }
 }
 const gameReset = Object.assign({}, game);
@@ -61,18 +73,41 @@ const convertBoolToString = (bool) => {
 }
 game.divs.altarDiv.style.display = 'none';
 game.divs.paintingDiv.style.display = 'none';
+game.divs.achievementDiv.style.display = 'none';
+game.divs.achievementButtonDiv.style.display = 'none';
 game.divs.mainDiv.style.display = 'block';
+document.getElementById("overclock-cooldown").style.display = "none";
+document.getElementById("overclock-active").style.display = "none";
+game.achievements.unlocked = new Array(game.achievements.names.length).fill(false)
+document.body.onload = () => generateAchievementMatrix();
 
 function increaseShapes() {
-    let increment = Math.round(game.variables.shapesPerClick * game.variables.ticksPerClick * (1 + game.variables.efficiency));
-    increment += Math.round(game.resources.gildedShapes * (game.prestige.gildedShapesBoostPercent / 100) * (game.variables.shapesPerClick / 2));
-
-    if (game.stats.statsOpen) updateStatsText();
+    let increment = game.variables.shapesPerClick * game.variables.ticksPerClick * (1 + game.variables.efficiency);
+    increment += game.resources.gildedShapes * (game.prestige.gildedShapesBoostPercent / 100) * (game.variables.shapesPerClick / 2);
+    if (game.variables.overclocked) increment = increment ** game.variables.overclockBoost;
+    increment = Math.round(increment);
 
     game.resources.shapes += increment
     game.stats.totalClicks++;
     game.stats.totalShapes += increment;
+    if (game.stats.statsOpen) updateStatsText();
+    if (game.resources.shapes >= 100) gainAchievement(0);
     updateShapeText();
+}
+
+function generateAchievementMatrix() {
+    let i = 0;
+    for (let item of game.achievements.names) {
+        let button = document.createElement("button");
+        let buttonText = document.createTextNode(`${item}:\n${game.achievements.descriptions[i]}`);
+        button.classList.add("button");
+        button.classList.add("achievement-locked");
+        button.appendChild(buttonText);
+        document.getElementById("achievements").appendChild(button);
+        document.getElementById("achievements").appendChild(document.createElement("br"));
+        game.achievements.buttons.push(button);
+        i++;
+    }
 }
 
 function updateShapeText() {
@@ -125,7 +160,12 @@ function buyShopItem(item) {
         case 2:
             game.variables.ticksPerClick += 2;
             break;
+        case 3:
+            game.variables.shapesPerClick *= 2;
+            break;
     }
+
+    if (game.stats.statsOpen) updateStatsText();
     updateShapeText();
 }
 
@@ -156,6 +196,7 @@ function prestige() {
     }
 
     document.getElementById("prestige-button").innerHTML = `Prestige (requires ${game.prestige.prestigeMin.toLocaleString("en-US")} shapes)`;
+    if (!(game.achievements.unlocked[1])) gainAchievement(1);
     updateShapeText();
 }
 
@@ -175,6 +216,10 @@ function toggleHelp() {
         Once you have 10 shapes, you can increase the amount of shapes per click by 1.<br>
         This will remove 10 shapes, and the cost of buying it again will double.<br><br>
         
+        Overclocking is a unique mechanic to increase your shape output.<br>
+        Every 40s, you can Overclock which raises your shape gain to the power of 1.5 (base).<br>
+        Some upgrades can increase this.<br<br>
+        
         Efficiency increases your shape gain by 1 for each point you have.<br>
         Ticks increase your shape gain by increasing the amount of times that your shapes are calculated per click.<br><br>
         
@@ -183,6 +228,11 @@ function toggleHelp() {
         
         After reaching 10 Gilded Shapes, the Altar is unlocked. There, you may convert Gilded Shapes into Astral Shapes, and allocate them to Spells.<br>
         Spells have various insanely positive effects based on the amount of Astral Shapes that are allocated to it.<br>
+        As Astral Shapes do not give the buff that Gilded Shapes do, it is advised to have 0 Astral Shapes available.<br><br>
+        
+        After you gain prestige 10 times, you unlock the Painting menu. Shapes can be painted for 100,000 shapes, and they are the only idle income source.<br>
+        Painted Shapes have multiple tiers, with each tier boosting the last. Painted Shapes only boost their own colour.<br>
+        Orange Shapes (Tier II) only boost Red Shapes (Tier I).
         `
     }
     game.stats.helpOpen = !game.stats.helpOpen;
@@ -319,11 +369,62 @@ function paintShapes(tier) {
     }
 }
 
+function overclock() {
+    if (!(game.variables.canOverclock)) return;
+    game.variables.overclocked = true;
+    game.variables.canOverclock = false;
+    document.getElementById("overclock-active").style.display = "block";
+    document.getElementById("overclock-button").disabled = true;
+    window.setTimeout(() => overclockCooldown(), 30000)
+}
+
+function overclockCooldown() {
+    game.variables.overclockTimer = 40;
+    game.variables.overclocked = false;
+    document.getElementById("overclock-active").style.display = "none";
+    document.getElementById("overclock-cooldown").style.display = 'block'
+    let timeoutId = window.setInterval(() => {
+        if (game.variables.overclockTimer === 0) {
+            document.getElementById("overclock-cooldown").style.display = 'none'
+            document.getElementById("overclock-button").disabled = false;
+            game.variables.canOverclock = true;
+            clearInterval(timeoutId);
+            return;
+        }
+        game.variables.overclockTimer--;
+        document.getElementById("overclock-cooldown").innerHTML = `Cooldown: ${game.variables.overclockTimer}s`;
+    }, 1000);
+}
+
+function gainAchievement(id) {
+    if (!(game.achievements.unlocked[id])) {
+        game.divs.achievementDiv.style.display = 'block';
+        game.divs.achievementDiv.innerHTML = `Achievement Unlocked! ${game.achievements.names[id]}`;
+        window.setTimeout(() => {
+            game.divs.achievementDiv.style.display = "none";
+            game.divs.achievementDiv.innerHTML = "";
+        }, 4000)
+    }
+    game.achievements.unlocked[id] = true;
+    game.achievements.buttons[id].classList.remove("achievement-locked")
+    game.achievements.buttons[id].classList.add("achievement-unlocked")
+}
+
+function toggleAchievements() {
+    if (game.achievements.achievementsOpen) {
+        game.divs.achievementButtonDiv.style.display = "none";
+    } else {
+        game.divs.achievementButtonDiv.style.display = "block";
+    }
+    game.achievements.achievementsOpen = !game.achievements.achievementsOpen
+}
+
 function hardReset() {
     if (!(confirm("Are you sure you want to hard reset?"))) return;
     if (!(confirm("This will erase EVERYTHING! Are you really sure?"))) return;
-    // add code sometime
+    game = Object.assign({}, gameReset)
     alert("Reset your game!");
+    updateAllText();
 }
 
 // SAVE SYSTEM WORK IN PROGRESS

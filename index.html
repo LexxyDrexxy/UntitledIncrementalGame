@@ -7,6 +7,8 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
+    <div class="achievement" id="achievement-text">(e)</div>
+
     <!-- Always visible text -->
     <p id="shapes-text" class="main-text-mono">Shapes: 0</p>
     <p id="gilded-shapes-text" class="main-text-mono">Gilded Shapes: 0</p>
@@ -20,13 +22,21 @@
         <button onclick="buyShopItem(1)" class="button other-button">Increase efficiency by 1</button>
         <p id="shop-1-cost" class="main-text-mono">Cost: 100 shapes</p>
         <button onclick="buyShopItem(2)" class="button other-button">Increase ticks per click by 2</button>
-        <p id="shop-2-cost" class="main-text-mono">Cost: 1500 shapes</p>
-        <button onclick="prestige()" class="button shiny-button" id="prestige-button">Prestige (requires 10000 shapes)</button>
+        <p id="shop-2-cost" class="main-text-mono">Cost: 1,500 shapes</p>
+        <button onclick="buyShopItem(3)" class="button other-button">Double shapes per click</button>
+        <p id="shop-3-cost" class="main-text-mono">Cost: 100,000 shapes</p>
+        <button onclick="prestige()" class="button shiny-button" id="prestige-button">Prestige (requires 10,000 shapes)</button>
         <br>
         <button onclick="toggleAltar()" class="button altar-button" id="altar-button">Altar (requires 10 Gilded Shapes)</button>
         <br>
         <button onclick="togglePainting()" class="button other-button" id="painting-button">Painting (required 5 total prestige)</button>
         <br><br>
+        <button onclick="overclock()" class="button shiny-button" id="overclock-button">Overclock</button>
+        <br>
+        <p id="overclock-active" class="main-text-mono" style="color:#60ff60">Active!</p>
+        <p id="overclock-cooldown" class="main-text-mono">Cooldown: 40s</p>
+        <p id="overclock-text" class="main-text-mono">Overclocking gives ^1.5 shape gain for 30 seconds and has a cooldown of 40 seconds.</p>
+        <br>
     </div>
 
     <!-- Altar div -->
@@ -56,14 +66,21 @@
         <img src="images/tier 1 painted shapes.png" alt="Tier I Painted Shapes. 33% chance for a Red Shape, 33% chance for a Blue Shape, 33% chance for a Yellow Shape, 1% chance for a Golden Shape.">
     </div>
 
+
     <!-- Help and links (always visible) -->
     <button onclick="toggleStats()" class="button other-button">Statistics</button>
     <button onclick="toggleHelp()" class="button other-button">Help</button>
+    <button onclick="toggleAchievements()" class="button other-button">Achievements</button>
     <p id="stats-text" class="main-text-mono"></p>
     <p id="help-text" class="main-text-mono"></p>
+
+    <!-- Filled by generateAchievementMatrix() -->
+    <div id="achievements"></div>
+
     <p class="main-text-mono">My Links:</p>
     <a class="main-text-mono" href="https://plaza.dsolver.ca/m/AmazinDood">Incremental Plaza</a>
     <a class="main-text-mono" href="https://www.youtube.com/@SomeRandomGuyWithInternet">Youtube</a>
+
     <!--<button onclick="hardReset()" class="button danger-button">Hard Reset</button>-->
     <script src="standard notation table.js"></script>
     <script src="init.js"></script>
