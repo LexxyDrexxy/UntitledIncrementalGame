@@ -53,8 +53,9 @@ let game = {
         tierCosts: [100_000],
     },
     achievements: {
-        names: ["It has to start somewhere", "Most generic idle game mechanic"],
-        descriptions: ["Gain 100 shapes.", "Prestige for the first time."],
+        names: ["It has to start somewhere", "Most generic idle game mechanic", "Buttons are very useful things", "Well, thank you very much", "Tiny little thing 😊"],
+        descriptions: ["Gain 100 shapes.", "Prestige for the first time.", "???", "???", "???"],
+        secretAchievementDescriptions: [null, null, "Press an achievement button.", "Click on any of my links.", "Tiny little hamster 😊"],
         buttons: [],
         achievementsOpen: false,
     },
@@ -103,6 +104,7 @@ function generateAchievementMatrix() {
         button.classList.add("button");
         button.classList.add("achievement-locked");
         button.appendChild(buttonText);
+        button.onclick = () => gainAchievement(2);
         document.getElementById("achievements").appendChild(button);
         document.getElementById("achievements").appendChild(document.createElement("br"));
         game.achievements.buttons.push(button);
@@ -400,6 +402,10 @@ function gainAchievement(id) {
     if (!(game.achievements.unlocked[id])) {
         game.divs.achievementDiv.style.display = 'block';
         game.divs.achievementDiv.innerHTML = `Achievement Unlocked! ${game.achievements.names[id]}`;
+        if (game.achievements.descriptions[id] === "???") {
+            game.achievements.descriptions[id] = game.achievements.secretAchievementDescriptions[id];
+            game.achievements.buttons[id].innerHTML = game.achievements.names[id] + ": " + game.achievements.descriptions[id];
+        }
         window.setTimeout(() => {
             game.divs.achievementDiv.style.display = "none";
             game.divs.achievementDiv.innerHTML = "";
@@ -413,8 +419,12 @@ function gainAchievement(id) {
 function toggleAchievements() {
     if (game.achievements.achievementsOpen) {
         game.divs.achievementButtonDiv.style.display = "none";
+        game.divs.mainDiv.style.display = "block";
+        document.getElementById("achievement-button").innerHTML = "Achievements"
     } else {
         game.divs.achievementButtonDiv.style.display = "block";
+        game.divs.mainDiv.style.display = "none";
+        document.getElementById("achievement-button").innerHTML = "Back"
     }
     game.achievements.achievementsOpen = !game.achievements.achievementsOpen
 }

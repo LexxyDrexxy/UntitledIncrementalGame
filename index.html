@@ -70,7 +70,7 @@
     <!-- Help and links (always visible) -->
     <button onclick="toggleStats()" class="button other-button">Statistics</button>
     <button onclick="toggleHelp()" class="button other-button">Help</button>
-    <button onclick="toggleAchievements()" class="button other-button">Achievements</button>
+    <button onclick="toggleAchievements()" class="button other-button" id="achievement-button">Achievements</button>
     <p id="stats-text" class="main-text-mono"></p>
     <p id="help-text" class="main-text-mono"></p>
 
@@ -78,8 +78,10 @@
     <div id="achievements"></div>
 
     <p class="main-text-mono">My Links:</p>
-    <a class="main-text-mono" href="https://plaza.dsolver.ca/m/AmazinDood">Incremental Plaza</a>
-    <a class="main-text-mono" href="https://www.youtube.com/@SomeRandomGuyWithInternet">Youtube</a>
+    <a class="main-text-mono" onclick="gainAchievement(3)" target="_blank" href="https://plaza.dsolver.ca/m/AmazinDood">Incremental Plaza</a>
+    <a class="main-text-mono" onclick="gainAchievement(3)" target="_blank" href="https://www.youtube.com/@SomeRandomGuyWithInternet">Youtube</a>
+
+    <p style="text-align:right"><a href="images/hamster-spinning.gif" target="_blank" onclick="gainAchievement(4)"><img src="images/hamster-spinning.gif" alt="Spinning Hamster" width="10" height="10"></a></p>
 
     <!--<button onclick="hardReset()" class="button danger-button">Hard Reset</button>-->
     <script src="standard notation table.js"></script>
