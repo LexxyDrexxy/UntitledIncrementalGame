@@ -4,6 +4,7 @@ let game = {
         totalShapes: 0,
         totalGildedShapes: 0,
         totalPrestige: 0,
+        overclockCount: 0,
         statsOpen: false,
         helpOpen: false,
     },
@@ -13,6 +14,7 @@ let game = {
         astralShapes: 0,
         paintedShapes: {
             t1: [0,0,0],
+            t2: [0,0,0],
             golden: 0,
         },
     },
@@ -24,6 +26,7 @@ let game = {
         overclockBoost: 1.5,
         canOverclock: true,
         overclockTimer: 0,
+        paintedShapesBoost: 100,
     },
     prestige: {
         prestigeMin: 10_000,
@@ -43,9 +46,9 @@ let game = {
         altarUnlocked: false,
         altarDiv: document.getElementById('altar'),
         astralShapesAvailable: 0,
-        astralShapesAllocated: [0, 0, 0],
+        astralShapesAllocated: [0, 0, 0, 0],
         totalAstralAllocated: 0,
-        spells: ["Golden Ritual", "Gifted Rebirth", "Astral Prestige"],
+        spells: ["Golden Ritual", "Gifted Rebirth", "Astral Prestige", "Cosmic Colours"],
     },
     painting: {
         paintingOpen: false,
@@ -53,11 +56,28 @@ let game = {
         tierCosts: [100_000],
     },
     achievements: {
-        names: ["It has to start somewhere", "Most generic idle game mechanic", "Buttons are very useful things", "Well, thank you very much", "Tiny little thing 😊"],
-        descriptions: ["Gain 100 shapes.", "Prestige for the first time.", "???", "???", "???"],
-        secretAchievementDescriptions: [null, null, "Press an achievement button.", "Click on any of my links.", "Tiny little hamster 😊"],
+        names: [
+            "It has to start somewhere",
+            "Most generic idle game mechanic",
+            "Buttons are very useful things",
+            "Well, thank you very much",
+            "Tiny little thing 😊",
+            "OVER overclocked"
+        ],
+        descriptions: ["Gain 100 shapes.",
+            "Prestige for the first time.",
+            "???",
+            "???",
+            "???",
+            "Overclock 25 times."
+        ],
+        secretAchievementDescriptions: [null, null, "Press an achievement button.", "Click on any of my links.", "Tiny little hamster 😊", null],
         buttons: [],
         achievementsOpen: false,
+        sorted: {
+            achievements: [],
+            descriptions: [],
+        },
     },
     divs: {
         mainDiv: document.getElementById("main-game"),
@@ -98,9 +118,22 @@ function increaseShapes() {
 
 function generateAchievementMatrix() {
     let i = 0;
-    for (let item of game.achievements.names) {
+    let sortedAchievements = []
+    let secretAchievements = [];
+    let sortedDescriptions = [];
+    for (let i in game.achievements.names) {
+        if (game.achievements.descriptions[i] !== "???") {
+            sortedAchievements.push(game.achievements.names[i])
+            sortedDescriptions.push(game.achievements.descriptions[i])
+        } else secretAchievements.push(game.achievements.names[i]);
+    }
+    for (let i in secretAchievements) {
+        sortedAchievements.push(secretAchievements[i]);
+        sortedDescriptions.push("???");
+    }
+    for (let item of sortedAchievements) {
         let button = document.createElement("button");
-        let buttonText = document.createTextNode(`${item}:\n${game.achievements.descriptions[i]}`);
+        let buttonText = document.createTextNode(`${item}:\n${sortedDescriptions[i]}`);
         button.classList.add("button");
         button.classList.add("achievement-locked");
         button.appendChild(buttonText);
@@ -110,6 +143,17 @@ function generateAchievementMatrix() {
         game.achievements.buttons.push(button);
         i++;
     }
+    game.achievements.sorted.achievements = sortedAchievements;
+    game.achievements.sorted.descriptions = sortedDescriptions;
+}
+
+function idleIncreaseShapes() {
+    for (let i in game.resources.paintedShapes.t1) {
+        let increment = game.resources.paintedShapes.t1[i] * Math.round(game.resources.paintedShapes.t2[i] / 10 + 1) * Math.round(game.variables.paintedShapesBoost / 100) * 10_000
+        if (increment !== 0) game.resources.shapes += increment;
+    }
+    updateShapeText();
+    if (game.stats.statsOpen) updateStatsText();
 }
 
 function updateShapeText() {
@@ -291,7 +335,7 @@ function convertShapes(type) {
 function allocateAstralShapes(spell) {
     let spellName = game.altar.spells[spell];
     let amount = +prompt("How many Astral Shapes to allocate in the spell?")
-    if (!(typeof amount === "number") || amount === 0) return;
+    if (amount === 0 || amount !== amount) return; // "amount !== amount" checks if amount is NaN
 
     game.altar.totalAstralAllocated = 0;
     for (let i of game.altar.astralShapesAllocated) {
@@ -315,6 +359,9 @@ function allocateAstralShapes(spell) {
             break;
         case 2:
             game.prestige.astralShapesOnPrestigePercent = amount * 2;
+            break;
+        case 3:
+            game.variables.paintedShapesBoost = amount * 3 + 100;
             break;
     }
     alert(`Allocated ${amount} Astral Shapes to spell ${spellName}!`);
@@ -375,6 +422,8 @@ function overclock() {
     if (!(game.variables.canOverclock)) return;
     game.variables.overclocked = true;
     game.variables.canOverclock = false;
+    game.stats.overclockCount++;
+    if (game.stats.overclockCount >= 25) gainAchievement(5)
     document.getElementById("overclock-active").style.display = "block";
     document.getElementById("overclock-button").disabled = true;
     window.setTimeout(() => overclockCooldown(), 30000)
@@ -399,24 +448,27 @@ function overclockCooldown() {
 }
 
 function gainAchievement(id) {
-    if (!(game.achievements.unlocked[id])) {
-        game.divs.achievementDiv.style.display = 'block';
-        game.divs.achievementDiv.innerHTML = `Achievement Unlocked! ${game.achievements.names[id]}`;
-        if (game.achievements.descriptions[id] === "???") {
-            game.achievements.descriptions[id] = game.achievements.secretAchievementDescriptions[id];
-            game.achievements.buttons[id].innerHTML = game.achievements.names[id] + ": " + game.achievements.descriptions[id];
-        }
-        window.setTimeout(() => {
-            game.divs.achievementDiv.style.display = "none";
-            game.divs.achievementDiv.innerHTML = "";
-        }, 4000)
+    if (game.achievements.unlocked[id]) return;
+
+    const sortedId = game.achievements.sorted.achievements.findIndex(item => item === game.achievements.names[id]);
+    game.divs.achievementDiv.style.display = 'block';
+    game.divs.achievementDiv.innerHTML = `Achievement Unlocked! ${game.achievements.sorted.achievements[sortedId]}`;
+    if (game.achievements.descriptions[id] === "???") {
+        game.achievements.descriptions[id] = game.achievements.secretAchievementDescriptions[id];
+        game.achievements.buttons[sortedId].innerHTML = game.achievements.names[id] + ": " + game.achievements.descriptions[id];
     }
+    window.setTimeout(() => {
+        game.divs.achievementDiv.style.display = "none";
+        game.divs.achievementDiv.innerHTML = "";
+    }, 4000)
     game.achievements.unlocked[id] = true;
-    game.achievements.buttons[id].classList.remove("achievement-locked")
-    game.achievements.buttons[id].classList.add("achievement-unlocked")
+    game.achievements.buttons[sortedId].classList.remove("achievement-locked")
+    game.achievements.buttons[sortedId].classList.add("achievement-unlocked")
 }
 
 function toggleAchievements() {
+    if (game.altar.altarOpen) toggleAltar()
+    if (game.painting.paintingOpen) togglePainting()
     if (game.achievements.achievementsOpen) {
         game.divs.achievementButtonDiv.style.display = "none";
         game.divs.mainDiv.style.display = "block";
@@ -454,3 +506,5 @@ function importSave() {
     delete saveItems[4]
     delete saveItems[7]
 }
+
+window.setInterval(() => idleIncreaseShapes(), 1000)
