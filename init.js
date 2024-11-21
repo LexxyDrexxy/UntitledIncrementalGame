@@ -7,14 +7,15 @@ let game = {
         overclockCount: 0,
         statsOpen: false,
         helpOpen: false,
+        clicksInLastSecond: 0,
     },
     resources: {
         shapes: 0,
         gildedShapes: 0,
         astralShapes: 0,
         paintedShapes: {
-            t1: [0,0,0],
-            t2: [0,0,0],
+            t1: [0,0,0], // [red, blue, yellow]
+            t2: [0,0,0], // [orange, purple, green]
             golden: 0,
         },
     },
@@ -53,7 +54,7 @@ let game = {
     painting: {
         paintingOpen: false,
         paintingUnlocked: false,
-        tierCosts: [100_000],
+        tierCosts: [100_000, 10], // tier 1 is shapes, rest are gilded shapes
     },
     achievements: {
         names: [
@@ -62,19 +63,39 @@ let game = {
             "Buttons are very useful things",
             "Well, thank you very much",
             "Tiny little thing 😊",
-            "OVER overclocked"
+            "OVER overclocked",
+            "Can't count that high",
+            "Δβγξξ",
+            "01001000 00110100 01011000 01011000 00110000 01010010",
+            "You CHEATER",
         ],
-        descriptions: ["Gain 100 shapes.",
+        descriptions: [
+            "Gain 100 shapes.",
             "Prestige for the first time.",
             "???",
             "???",
             "???",
-            "Overclock 25 times."
+            "Overclock 25 times.",
+            "Have over 10 Gilded Shapes after you prestige once.",
+            "Unlock the Altar.",
+            "???",
+            "???",
         ],
-        secretAchievementDescriptions: [null, null, "Press an achievement button.", "Click on any of my links.", "Tiny little hamster 😊", null],
+        secretAchievementDescriptions: [
+            null,
+            null,
+            "Press an achievement button.",
+            "Click on any of my links.",
+            "Tiny little hamster 😊",
+            null,
+            null,
+            null,
+            "Execute the function hax() from the console.",
+            "You used an autoclicker. (Either that, or you clicked really fast)",
+        ],
         buttons: [],
         achievementsOpen: false,
-        sorted: {
+        sorted: { // filled by generateAchievementMatrix()
             achievements: [],
             descriptions: [],
         },
@@ -100,7 +121,10 @@ game.divs.mainDiv.style.display = 'block';
 document.getElementById("overclock-cooldown").style.display = "none";
 document.getElementById("overclock-active").style.display = "none";
 game.achievements.unlocked = new Array(game.achievements.names.length).fill(false)
+game.achievements.secretAchievementCount = game.achievements.descriptions.filter(x => x === "???").length
 document.body.onload = () => generateAchievementMatrix();
+window.setInterval(() => idleIncreaseShapes(), 1000)
+window.setInterval(() => cheaterCheck(), 1000)
 
 function increaseShapes() {
     let increment = game.variables.shapesPerClick * game.variables.ticksPerClick * (1 + game.variables.efficiency);
@@ -110,6 +134,7 @@ function increaseShapes() {
 
     game.resources.shapes += increment
     game.stats.totalClicks++;
+    game.stats.clicksInLastSecond++;
     game.stats.totalShapes += increment;
     if (game.stats.statsOpen) updateStatsText();
     if (game.resources.shapes >= 100) gainAchievement(0);
@@ -140,6 +165,9 @@ function generateAchievementMatrix() {
         button.onclick = () => gainAchievement(2);
         document.getElementById("achievements").appendChild(button);
         document.getElementById("achievements").appendChild(document.createElement("br"));
+        if (i === game.achievements.descriptions.length - game.achievements.secretAchievementCount - 1) {
+            document.getElementById("achievements").appendChild(document.createElement("br"));
+        }
         game.achievements.buttons.push(button);
         i++;
     }
@@ -150,6 +178,7 @@ function generateAchievementMatrix() {
 function idleIncreaseShapes() {
     for (let i in game.resources.paintedShapes.t1) {
         let increment = game.resources.paintedShapes.t1[i] * Math.round(game.resources.paintedShapes.t2[i] / 10 + 1) * Math.round(game.variables.paintedShapesBoost / 100) * 10_000
+        increment *= game.resources.paintedShapes.golden + 1
         if (increment !== 0) game.resources.shapes += increment;
     }
     updateShapeText();
@@ -176,7 +205,7 @@ function updateStatsText() {
     document.getElementById("stats-text").innerHTML = `
         Total Clicks: ${game.stats.totalClicks.toLocaleString("en-US")}<br>
         Total Shapes: ${game.stats.totalShapes.toLocaleString("en-US")}<br>
-        Total Gilded Shapes ${game.stats.totalGildedShapes.toLocaleString("en-US")}<br>
+        Total Gilded Shapes: ${game.stats.totalGildedShapes.toLocaleString("en-US")}<br>
         Total Prestiges: ${game.stats.totalPrestige.toLocaleString("en-US")}<br>
         Shapes per Click: ${game.variables.shapesPerClick.toLocaleString("en-US")}<br>
         Ticks per Click: ${game.variables.ticksPerClick.toLocaleString("en-US")}<br>
@@ -184,7 +213,12 @@ function updateStatsText() {
 
         Is altar unlocked? ${convertBoolToString(game.altar.altarUnlocked)}<br>
         Astral Shapes allocated: ${game.altar.totalAstralAllocated.toLocaleString("en-US")}<br>
-        Astral Shapes available: ${game.altar.astralShapesAvailable.toLocaleString("en-US")}<br>`
+        Astral Shapes available: ${game.altar.astralShapesAvailable.toLocaleString("en-US")}<br><br>
+
+        Is painting unlocked? ${convertBoolToString(game.painting.paintingUnlocked)}<br>
+        Golden Shapes: ${game.resources.paintedShapes.golden.toLocaleString("en-US")}<br>
+        Total Tier I Shapes: ${game.resources.paintedShapes.t1.reduce((a,b) => a+b,0).toLocaleString("en-US")}<br>
+        Total Tier II Shapes: ${game.resources.paintedShapes.t2.reduce((a,b) => a+b,0).toLocaleString("en-US")}<br>`
 }
 
 function buyShopItem(item) {
@@ -243,6 +277,7 @@ function prestige() {
 
     document.getElementById("prestige-button").innerHTML = `Prestige (requires ${game.prestige.prestigeMin.toLocaleString("en-US")} shapes)`;
     if (!(game.achievements.unlocked[1])) gainAchievement(1);
+    else if (game.resources.gildedShapes >= 10) gainAchievement(6);
     updateShapeText();
 }
 
@@ -264,7 +299,7 @@ function toggleHelp() {
         
         Overclocking is a unique mechanic to increase your shape output.<br>
         Every 40s, you can Overclock which raises your shape gain to the power of 1.5 (base).<br>
-        Some upgrades can increase this.<br<br>
+        Some upgrades can increase this.<br><br>
         
         Efficiency increases your shape gain by 1 for each point you have.<br>
         Ticks increase your shape gain by increasing the amount of times that your shapes are calculated per click.<br><br>
@@ -292,6 +327,7 @@ function toggleAltar() {
         return;
     }
 
+    gainAchievement(7);
     document.getElementById("altar-button").innerHTML = "Altar"
     if (game.altar.altarOpen) {
         game.altar.altarDiv.style.display = 'none';
@@ -390,11 +426,15 @@ function togglePainting() {
 }
 
 function paintShapes(tier) {
-    if (game.resources.shapes < game.painting.tierCosts[tier]) {
-        alert(`To paint shapes of tier ${tier + 1}, you need ${game.painting.tierCosts[tier].toLocaleString("en-US")} shapes!`);
+    if (tier === 0 && game.resources.shapes < game.painting.tierCosts[tier]) {
+        alert(`To paint shapes of tier 1, you need ${game.painting.tierCosts[0].toLocaleString("en-US")} shapes!`);
+        return;
+    } else if (game.resources.gildedShapes < game.painting.tierCosts[tier]) {
+        alert(`To paint shapes of tier ${tier + 1}, you need ${game.painting.tierCosts[tier].toLocaleString("en-US")} Gilded Shapes!`);
         return;
     }
-    game.resources.shapes -= game.painting.tierCosts[tier];
+    if (tier === 0) game.resources.shapes -= game.painting.tierCosts[tier];
+    else game.resources.gildedShapes -= game.painting.tierCosts[tier];
     let rng = +((Math.random() * 100).toFixed(2));
     switch (tier) {
         case 0:
@@ -415,6 +455,23 @@ function paintShapes(tier) {
                 alert("+1 Red Shape!")
             }
             break;
+        case 1:
+            if (rng > 99) {
+                game.resources.paintedShapes.golden++;
+                alert("WOW! +1 Golden Shape!")
+            }
+            else if (rng > 66) {
+                game.resources.paintedShapes.t2[2]++;
+                alert("+1 Green Shape!")
+            }
+            else if (rng > 33) {
+                game.resources.paintedShapes.t2[1]++;
+                alert("+1 Purple Shape!")
+            }
+            else {
+                game.resources.paintedShapes.t2[0]++;
+                alert("+1 Orange Shape!")
+            }
     }
 }
 
@@ -481,6 +538,8 @@ function toggleAchievements() {
     game.achievements.achievementsOpen = !game.achievements.achievementsOpen
 }
 
+function cheaterCheck() {if (game.stats.clicksInLastSecond > 20) gainAchievement(9); game.stats.clicksInLastSecond = 0}
+
 function hardReset() {
     if (!(confirm("Are you sure you want to hard reset?"))) return;
     if (!(confirm("This will erase EVERYTHING! Are you really sure?"))) return;
@@ -488,7 +547,7 @@ function hardReset() {
     alert("Reset your game!");
     updateAllText();
 }
-
+const hax = () => gainAchievement(8);
 // SAVE SYSTEM WORK IN PROGRESS
 function exportSave() {
     let save = `${game.stats.totalClicks};_00a;${game.stats.totalShapes};${game.stats.totalGildedShapes};${game.stats.totalGildedShapes-7};${game.stats.totalPrestige};${game.resources.shapes};${game.resources.shapes+game.stats.totalPrestige}`
@@ -506,5 +565,3 @@ function importSave() {
     delete saveItems[4]
     delete saveItems[7]
 }
-
-window.setInterval(() => idleIncreaseShapes(), 1000)
