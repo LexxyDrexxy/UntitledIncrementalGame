@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Untitled Incremental Game (Changelog)</title>
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <style>
+        body {background-color: #1b1e23}
+        div.changelog {
+            overflow: auto;
+            margin: auto;
+            width: 50%;
+            height: 75%;
+            background-color: #60ff60;
+            border: 4px solid #12d512;
+            color: #004300;
+            font-family: monospace;
+            font-size: 16px;
+            text-align: center;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="changelog"></div>
+<script>
+fetch("changelog.txt")
+.then(response => response.text())
+.then(text => {
+    text = text.replaceAll("\n", "<br>");
+    text = text.replaceAll("[", "<b style='font-size:20px; color:#256c00'>");
+    text = text.replaceAll("]", "</b>");
+    document.querySelector("div.changelog").innerHTML = text
+})
+.catch(error => console.log("oops :(\n",error));
+</script>
+</body>
+</html>

@@ -7,35 +7,60 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <div class="achievement" id="achievement-text">(e)</div>
-
+    <!-- Achievement popup -->
+    <div>
+        <div class="achievement" id="achievement-text">🙁 This page didn't load correctly. Please refresh! 🙁</div>
+    </div>
     <!-- Always visible text -->
-    <p id="shapes-text" class="main-text-mono">Shapes: 0</p>
-    <p id="gilded-shapes-text" class="main-text-mono">Gilded Shapes: 0</p>
+    <div class="container">
+        <p id="shapes-text" class="main-text-mono" style="font-size:15px">Shapes: 0</p>
+        <p id="gilded-shapes-text" class="main-text-mono" style="font-size:15px">Gilded Shapes: 0</p>
+    </div>
+    <br>
+
+    <div id="modal">
+        <div class="modal-content">
+            <span class="close-button main-text-mono" id="modal-close">&times;</span><br>
+            <p class="main-text-mono" style="font-size:30px; background-color:#004a8e; border-radius: 5px; text-align: center;" id="hello-txt">Hello!</p>
+            <p class="main-text-mono" style="font-size:15px">
+                Thanks for playing my game!<br>
+                Just so you know, this uses localStorage to save your stats, so if you delete your cookies, your progress will be reset.<br>
+                Additionally, some browsers may have a setting to the effect of clearing cookies when closing a site, you will need to disable that too.<br>
+                This project is open-source, and you can review the code yourself to confirm that nothing malicious is happening.<br>
+                If you find any bugs, please inform me on GitHub.<br>
+                This project is fairly old, so there will no doubt be many bugs.<br>
+            </p>
+            <a href="changelog.html" class="main-text-mono" style="font-size:15px" target="_blank">Click here to view the changelog!</a>
+        </div>
+    </div>
 
     <!-- Main game div -->
     <div id="main-game">
         <button onclick="increaseShapes()" class="button main-button" id="main-button">Generate Shapes</button>
         <br>
-        <button onclick="buyShopItem(0)" class="button other-button">Increase shapes per click by 1</button>
+        <button onclick="buyShopItem(0)" class="button other-button" id="shop-0">Increase shapes per click by 1</button>
         <p id="shop-0-cost" class="main-text-mono">Cost: 10 shapes</p>
-        <button onclick="buyShopItem(1)" class="button other-button">Increase efficiency by 1</button>
+        <button onclick="buyShopItem(1)" class="button other-button" id="shop-1">Increase efficiency by 1</button>
         <p id="shop-1-cost" class="main-text-mono">Cost: 100 shapes</p>
-        <button onclick="buyShopItem(2)" class="button other-button">Increase ticks per click by 2</button>
+        <button onclick="buyShopItem(2)" class="button other-button" id="shop-2">Increase ticks per click by 2</button>
         <p id="shop-2-cost" class="main-text-mono">Cost: 1,500 shapes</p>
-        <button onclick="buyShopItem(3)" class="button other-button">Double shapes per click</button>
+        <button onclick="buyShopItem(3)" class="button other-button" id="shop-3">Double shapes per click</button>
         <p id="shop-3-cost" class="main-text-mono">Cost: 100,000 shapes</p>
+        <button onclick="buyShopItem(4)" class="button other-button" id="shop-4">Increase Overclock boost by ^0.05 (additive)</button>
+        <p id="shop-4-cost" class="main-text-mono">Cost: 25,000,000 shapes</p>
+        <button onclick="buyShopItem(5)" class="button other-button" id="shop-5">Decrease Overclock cooldown by 1s</button>
+        <p id="shop-5-cost" class="main-text-mono">Cost: 1,000,000,000 shapes</p>
         <button onclick="prestige()" class="button shiny-button" id="prestige-button">Prestige (requires 10,000 shapes)</button>
         <br>
         <button onclick="toggleAltar()" class="button altar-button" id="altar-button">Altar (requires 10 Gilded Shapes)</button>
         <br>
-        <button onclick="togglePainting()" class="button other-button" id="painting-button">Painting (required 5 total prestige)</button>
+        <button onclick="togglePainting()" class="button other-button" id="painting-button">Painting (requires 5 total prestige)</button>
         <br><br>
         <button onclick="overclock()" class="button shiny-button" id="overclock-button">Overclock</button>
         <br>
         <p id="overclock-active" class="main-text-mono" style="color:#60ff60">Active!</p>
         <p id="overclock-cooldown" class="main-text-mono">Cooldown: 40s</p>
-        <p id="overclock-text" class="main-text-mono">Overclocking gives ^1.5 shape gain for 30 seconds and has a cooldown of 40 seconds.</p>
+        <p id="overclock-text" class="main-text-mono">Overclocking gives ^1.2 shape gain for 30 seconds and has a cooldown of 40 seconds.</p>
         <br>
     </div>
 
@@ -60,7 +85,7 @@
     </div>
 
     <!-- Painting div -->
-    <div id="paint" style="display:none;">
+    <div id="paint">
         <button onclick="togglePainting()" class="button other-button">Back</button>
         <br><br>
         <button onclick="paintShapes(0)" class="button painting-button">Paint a Tier I Shape</button>
@@ -77,6 +102,9 @@
     <button onclick="toggleStats()" class="button other-button">Statistics</button>
     <button onclick="toggleHelp()" class="button other-button">Help</button>
     <button onclick="toggleAchievements()" class="button other-button" id="achievement-button">Achievements</button>
+    <br>
+    <button onclick="saveToLocalStorage()" class="button other-button">Save Data</button>
+    <button onclick="loadFromLocalStorage()" class="button other-button">Load Data</button>
     <p id="stats-text" class="main-text-mono"></p>
     <p id="help-text" class="main-text-mono"></p>
 
@@ -86,10 +114,11 @@
     <p class="main-text-mono">My Links:</p>
     <a class="main-text-mono" onclick="gainAchievement(3)" target="_blank" href="https://plaza.dsolver.ca/m/AmazinDood">Incremental Plaza</a>
     <a class="main-text-mono" onclick="gainAchievement(3)" target="_blank" href="https://www.youtube.com/@SomeRandomGuyWithInternet">Youtube</a>
+    <a class="main-text-mono" onclick="gainAchievement(3)" target="_blank" href="https://github.com/AmazinDooD">Github</a>
     <p style="text-align:right"><a href="images/hamster-spinning.gif" target="_blank" onclick="gainAchievement(4)"><img src="images/hamster-spinning.gif" alt="Spinning Hamster" width="10" height="10"></a></p>
 
-    <!--<button onclick="hardReset()" class="button danger-button">Hard Reset</button>-->
-    <script src="standard notation table.js"></script> <!-- useless :) -->
+    <button onclick="hardReset()" class="button danger-button">Hard Reset</button>
     <script src="init.js"></script>
+    <script src="standard notation table.js"></script> <!-- useless :) -->
 </body>
 </html>

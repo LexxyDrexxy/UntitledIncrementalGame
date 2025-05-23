@@ -1,4 +1,4 @@
-let standardNotationTable = [ // idle research numbers, basically up to 1e100, 10DTg or 1 googol
+let standardNotationTable = [ // antimatter dimensions numbers, basically up to 1e100, 10DTg or 1 googol
     {divider:"1e99",suffix:"DTg"},
     {divider:"1e96",suffix:"UTg"},
     {divider:"1e93",suffix:"Tg"},
@@ -43,3 +43,18 @@ function convertToAbbreviation(number) {
     }
     return Infinity;
 }
+/*
+M	B	T	Qa	Qt	Sx	Sp	Oc	No	Dc
+Dc  Vg	Tg  Qd  Qi  Se	St  Og	Nn	Ce
+Ce  Dn  Tc  Qe  Qu  Sc  Si  Oe  Ne
+
+1.79e308                        Biggest non-BigInt value
+1e3,003                         1MI
+1e3,000,003                     1MC
+1e3,000,000,003                 1NA
+1e3,000,000,000,003             1PC
+1e3,000,000,000,000,003         1FM
+1e3,000,000,000,000,000,003     1AT
+1e3,000,000,000,000,000,000,003 1ZP
+>1ZP                            undefined
+*/

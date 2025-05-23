@@ -1,0 +1,25 @@
+[v1.1 (latest)]
+[The Gigantic Bugfix Update]
++ Finally started using localStorage!
++ Added modal on load
++ Rounded corners of this div
++ Added clarification to some informative text
++ Added warning when playing without cookies
++ Improved visibility of important currencies
++ Added Github link
++ Made shop buttons disable if not enough resources are owned
++ Added Save and Load buttons
+~ Fixed minor text errors in Help and Painting menu
+~ Updated title for changelog window
+~ Altered colour of Generate Shapes button
+~ Capped overclock boost shop item at ^5
+- Fixed not checking for NaN, negative numbers or Infinity while converting Gilded Shapes
+- Fixed holding Enter counting as repeatedly clicking the Generate Shapes button
+- Fixed not updating shop cost text on prestige
+
+[v1]
+[The Update with Nothing Noteworthy]
++ Added 5th and 6th shop item
++ Added changelog
+~ Nerfed Overclock boost from ^1.5 to ^1.2
+- Removed useless style from paint div

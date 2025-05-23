@@ -1,130 +1,201 @@
-let game = {
-    stats: {
-        totalClicks: 0,
-        totalShapes: 0,
-        totalGildedShapes: 0,
-        totalPrestige: 0,
-        overclockCount: 0,
-        statsOpen: false,
-        helpOpen: false,
-        clicksInLastSecond: 0,
-    },
-    resources: {
-        shapes: 0,
-        gildedShapes: 0,
-        astralShapes: 0,
-        paintedShapes: {
-            t1: [0,0,0], // [red, blue, yellow]
-            t2: [0,0,0], // [orange, purple, green]
-            golden: 0,
+function initGameObject() {
+    return {
+        stats: {
+            totalClicks: 0,
+            totalShapes: 0,
+            totalGildedShapes: 0,
+            totalPrestige: 0,
+            overclockCount: 0,
+            statsOpen: false,
+            helpOpen: false,
+            clicksInLastSecond: 0,
         },
-    },
-    variables: {
-        shapesPerClick: 1,
-        ticksPerClick: 1,
-        efficiency: 0,
-        overclocked: false,
-        overclockBoost: 1.5,
-        canOverclock: true,
-        overclockTimer: 0,
-        paintedShapesBoost: 100,
-    },
-    prestige: {
-        prestigeMin: 10_000,
-        prestigeIncrement: 10,
-        gildedShapesBoostPercent: 100,
-        gildedShapesGainPercent: 100,
-        astralShapesOnPrestigePercent: 0,
-    },
-    shop: {
-        costs: [10, 100, 1_500, 100_000, 25_000_000, 1_000_000_000],
-        isExpensiveCost: [false, true, false, true, undefined, undefined],
-        costIncrease: 2,
-        costIncreaseExpensive: 3,
-    },
-    altar: {
-        altarOpen: false,
-        altarUnlocked: false,
-        altarDiv: document.getElementById('altar'),
-        astralShapesAvailable: 0,
-        astralShapesAllocated: [0, 0, 0, 0],
-        totalAstralAllocated: 0,
-        spells: ["Golden Ritual", "Gifted Rebirth", "Astral Prestige", "Cosmic Colours"],
-    },
-    painting: {
-        paintingOpen: false,
-        paintingUnlocked: false,
-        tierCosts: [100_000, 10], // tier 1 is shapes, rest are gilded shapes
-    },
-    achievements: {
-        names: [
-            "It has to start somewhere",
-            "Most generic idle game mechanic",
-            "Buttons are very useful things",
-            "Well, thank you very much",
-            "Tiny little thing 😊",
-            "OVER overclocked",
-            "Can't count that high",
-            "Δβγξξ",
-            "01001000 00110100 01011000 01011000 00110000 01010010",
-            "You CHEATER",
-        ],
-        descriptions: [
-            "Gain 100 shapes.",
-            "Prestige for the first time.",
-            "???",
-            "???",
-            "???",
-            "Overclock 25 times.",
-            "Have over 10 Gilded Shapes after you prestige once.",
-            "Unlock the Altar.",
-            "???",
-            "???",
-        ],
-        secretAchievementDescriptions: [
-            null,
-            null,
-            "Press an achievement button.",
-            "Click on any of my links.",
-            "Tiny little hamster 😊",
-            null,
-            null,
-            null,
-            "Execute the function hax() from the console.",
-            "You used an autoclicker. (Either that, or you clicked really fast)",
-        ],
-        buttons: [],
-        achievementsOpen: false,
-        sorted: { // filled by generateAchievementMatrix()
-            achievements: [],
-            descriptions: [],
+        resources: {
+            shapes: 0,
+            gildedShapes: 0,
+            astralShapes: 0,
+            paintedShapes: {
+                t1: [0,0,0], // [red, blue, yellow]
+                t2: [0,0,0], // [orange, purple, green]
+                golden: 0,
+            },
         },
-    },
-    divs: {
-        mainDiv: document.getElementById("main-game"),
-        altarDiv: document.getElementById("altar"),
-        paintingDiv: document.getElementById("paint"),
-        achievementDiv: document.getElementById("achievement-text"),
-        achievementButtonDiv: document.getElementById("achievements"),
+        variables: {
+            shapesPerClick: 1,
+            ticksPerClick: 1,
+            efficiency: 0,
+            overclocked: false,
+            overclockBoost: 1.2,
+            canOverclock: true,
+            overclockTimer: 0,
+            paintedShapesBoost: 100,
+            overclockCooldown: 40,
+        },
+        prestige: {
+            prestigeMin: 10_000,
+            prestigeIncrement: 10,
+            gildedShapesBoostPercent: 100,
+            gildedShapesGainPercent: 100,
+            astralShapesOnPrestigePercent: 0,
+        },
+        shop: {
+            costs: [10, 100, 1_500, 100_000, 25_000_000, 1_000_000_000],
+            isExpensiveCost: [false, true, false, true, true, true],
+            costIncrease: 2,
+            costIncreaseExpensive: 3,
+        },
+        altar: {
+            altarOpen: false,
+            altarUnlocked: false,
+            altarDiv: document.getElementById('altar'),
+            astralShapesAvailable: 0,
+            astralShapesAllocated: [0, 0, 0, 0],
+            totalAstralAllocated: 0,
+            spells: ["Golden Ritual", "Gifted Rebirth", "Astral Prestige", "Cosmic Colours"],
+        },
+        painting: {
+            paintingOpen: false,
+            paintingUnlocked: false,
+            tierCosts: [100_000, 10], // tier 1 is shapes, rest are gilded shapes
+        },
+        achievements: {
+            names: [
+                "It has to start somewhere",
+                "Most generic idle game mechanic",
+                "Buttons are very useful things",
+                "Well, thank you very much",
+                "Tiny little thing 😊",
+                "OVER overclocked",
+                "Can't count that high",
+                "Δβγξξ",
+                "01001000 00110100 01011000 01011000 00110000 01010010",
+                "You CHEATER",
+            ],
+            descriptions: [
+                "Gain 100 shapes.",
+                "Prestige for the first time.",
+                "???",
+                "???",
+                "???",
+                "Overclock 25 times.",
+                "Have over 10 Gilded Shapes after you prestige once.",
+                "Unlock the Altar.",
+                "???",
+                "???",
+            ],
+            secretAchievementDescriptions: [
+                null,
+                null,
+                "Press an achievement button.",
+                "Click on any of my links.",
+                "Tiny little hamster 😊",
+                null,
+                null,
+                null,
+                "Execute the function hax() from the console.",
+                "You used an autoclicker. (Either that, or you clicked really fast)",
+            ],
+            buttons: [],
+            achievementsOpen: false,
+            sorted: { // filled by generateAchievementMatrix()
+                achievements: [],
+                descriptions: [],
+            },
+        },
+        divs: {
+            mainDiv: document.getElementById("main-game"),
+            altarDiv: document.getElementById("altar"),
+            paintingDiv: document.getElementById("paint"),
+            achievementDiv: document.getElementById("achievement-text"),
+            achievementButtonDiv: document.getElementById("achievements"),
+        }
     }
 }
-const gameReset = Object.assign({}, game);
-const convertBoolToString = (bool) => {
-    if (bool) return "Yes"
-    return "No"
+
+let game = initGameObject();
+
+const get = (id) => {
+    if (id[0] !== "#" || id[0] !== ".") id = "#" + id
+    return document.querySelector(id)
 }
+
+const localStorageItems = () => {
+    let localStorageItems = [
+        ["stats-totalClicks",game.stats.totalClicks],
+        ["stats-totalShapes",game.stats.totalShapes],
+        ["stats-totalGildedShapes",game.stats.totalGildedShapes],
+        ["stats-totalPrestige",game.stats.totalPrestige],
+        ["stats-overclockCount",game.stats.overclockCount],
+        ["resources-shapes",game.resources.shapes],
+        ["resources-gildedShapes",game.resources.gildedShapes],
+        ["resources-astralShapes",game.resources.astralShapes],
+        ["resources-paintedShapes-t1-0",game.resources.paintedShapes.t1[0]],
+        ["resources-paintedShapes-t1-1",game.resources.paintedShapes.t1[1]],
+        ["resources-paintedShapes-t1-2",game.resources.paintedShapes.t1[2]],
+        ["resources-paintedShapes-t2-0",game.resources.paintedShapes.t2[0]],
+        ["resources-paintedShapes-t2-1",game.resources.paintedShapes.t2[1]],
+        ["resources-paintedShapes-t2-2",game.resources.paintedShapes.t2[2]],
+        ["resources-paintedShapes-golden",game.resources.paintedShapes.golden],
+        ["variables-shapesPerClick",game.variables.shapesPerClick],
+        ["variables-ticksPerClick",game.variables.ticksPerClick],
+        ["variables-efficiency",game.variables.efficiency],
+        ["variables-overclockBoost",game.variables.overclockBoost],
+        ["variables-overclockCooldown",game.variables.overclockCooldown],
+        ["variables-paintedShapesBoost",game.variables.paintedShapesBoost],
+        ["prestige-prestigeMin",game.prestige.prestigeMin],
+        ["prestige-gildedShapesBoostPercent",game.prestige.gildedShapesBoostPercent],
+        ["prestige-gildedShapesGainPercent",game.prestige.gildedShapesGainPercent],
+        ["prestige-astralShapesOnPrestigePercent",game.prestige.astralShapesOnPrestigePercent],
+        ["altar-altarUnlocked",game.altar.altarUnlocked],
+        ["altar-astralShapesAvailable",game.altar.astralShapesAvailable],
+        ["altar-totalAstralAllocated",game.altar.totalAstralAllocated],
+        ["painting-paintingUnlocked",game.painting.paintingUnlocked],
+    ]
+    for (let i=0;i<game.shop.costs.length;i++) localStorageItems.push(["shop-costs-"+i,game.shop.costs[i]]);
+    for (let i=0;i<game.altar.astralShapesAllocated.length;i++) localStorageItems.push(["altar-astralShapesAllocated-"+i,game.altar.astralShapesAllocated[i]]);
+    for (let i=0;i<game.achievements.unlocked.length;i++) localStorageItems.push(["achievements-unlocked-"+i,game.achievements.unlocked[i]?1:0]);
+    return localStorageItems
+}
+
+const convertBoolToString = bool => bool ? "Yes" : "No"
 game.divs.altarDiv.style.display = 'none';
 game.divs.paintingDiv.style.display = 'none';
 game.divs.achievementDiv.style.display = 'none';
 game.divs.achievementButtonDiv.style.display = 'none';
 game.divs.mainDiv.style.display = 'block';
-document.getElementById("overclock-cooldown").style.display = "none";
-document.getElementById("overclock-active").style.display = "none";
+get("overclock-cooldown").style.display = "none";
+get("overclock-active").style.display = "none";
 game.achievements.unlocked = new Array(game.achievements.names.length).fill(false)
 game.achievements.secretAchievementCount = game.achievements.descriptions.filter(x => x === "???").length
-document.body.onload = () => generateAchievementMatrix();
+document.body.onload = () => {
+    get("modal").style.display = "block"
+    get("modal-close").onclick = () => {get("modal").style.display = "none"}
+    if (!(navigator.cookieEnabled)) {
+        const txt = document.createElement("p")
+        txt.classList.add("main-text-mono")
+        txt.innerHTML = "Your cookies are disabled!"
+        txt.style.fontSize = "35px"
+        txt.style.backgroundColor = "#be0000"
+        txt.style.borderRadius = "5px"
+        txt.style.color = "#4b0000"
+        txt.style.textAlign = "center"
+        get("hello-txt").insertAdjacentElement("beforebegin",txt)
+    }
+    generateAchievementMatrix();
+    loadFromLocalStorage()
+    for (let i=0;i<game.shop.costs.length;i++) {
+        get(`shop-${i}-cost`).innerHTML = `Cost: ${game.shop.costs[i].toLocaleString("en-US")} shapes`;
+    }
+    updateShopButtons()
+    get("stats-text").innerHTML = ""
+}
 window.setInterval(() => idleIncreaseShapes(), 1000)
 window.setInterval(() => cheaterCheck(), 1000)
+window.setInterval(() => saveToLocalStorage(), 25000)
+window.onclick = (e) => {
+    if (e.target === get("modal") && navigator.cookieEnabled) get("modal").style.display = "none";
+}
+get("main-button").onkeydown = (e) => {if (e.keyCode === 13) e.preventDefault();}
 
 function increaseShapes() {
     let increment = game.variables.shapesPerClick * game.variables.ticksPerClick * (1 + game.variables.efficiency);
@@ -138,6 +209,7 @@ function increaseShapes() {
     game.stats.totalShapes += increment;
     if (game.stats.statsOpen) updateStatsText();
     if (game.resources.shapes >= 100) gainAchievement(0);
+    updateShopButtons();
     updateShapeText();
 }
 
@@ -163,10 +235,10 @@ function generateAchievementMatrix() {
         button.classList.add("achievement-locked");
         button.appendChild(buttonText);
         button.onclick = () => gainAchievement(2);
-        document.getElementById("achievements").appendChild(button);
-        document.getElementById("achievements").appendChild(document.createElement("br"));
+        get("achievements").appendChild(button);
+        get("achievements").appendChild(document.createElement("br"));
         if (i === game.achievements.descriptions.length - game.achievements.secretAchievementCount - 1) {
-            document.getElementById("achievements").appendChild(document.createElement("br"));
+            get("achievements").appendChild(document.createElement("br"));
         }
         game.achievements.buttons.push(button);
         i++;
@@ -183,33 +255,36 @@ function idleIncreaseShapes() {
     }
     updateShapeText();
     if (game.stats.statsOpen) updateStatsText();
+    updateShopButtons()
 }
 
 function updateShapeText() {
-    document.getElementById("shapes-text").innerHTML = `Shapes: ${game.resources.shapes.toLocaleString("en-US")}`;
-    document.getElementById("gilded-shapes-text").innerHTML = `Gilded Shapes: ${game.resources.gildedShapes.toLocaleString("en-US")}`;
+    get("shapes-text").innerHTML = `Shapes: ${game.resources.shapes.toLocaleString("en-US")}`;
+    get("gilded-shapes-text").innerHTML = `Gilded Shapes: ${game.resources.gildedShapes.toLocaleString("en-US")}`;
 
     if (game.altar.altarOpen) {
-        document.getElementById("astral-shapes-text").innerHTML = `Astral Shapes: ${game.resources.astralShapes.toLocaleString("en-US")}`;
-        document.getElementById("astral-shapes-available-text").innerHTML = `Astral Shapes Available: ${game.altar.astralShapesAvailable.toLocaleString("en-US")}`;
+        get("astral-shapes-text").innerHTML = `Astral Shapes: ${game.resources.astralShapes.toLocaleString("en-US")}`;
+        get("astral-shapes-available-text").innerHTML = `Astral Shapes Available: ${game.altar.astralShapesAvailable.toLocaleString("en-US")}`;
     }
 }
 
 function updateAllText() {
     updateShapeText();
-    updateStatsText();
-    document.getElementById("prestige-button").innerHTML = `Prestige (requires ${game.prestige.prestigeMin.toLocaleString("en-US")} shapes)`
+    if (game.stats.statsOpen) updateStatsText();
+    updateShopButtons()
+    get("prestige-button").innerHTML = `Prestige (requires ${game.prestige.prestigeMin.toLocaleString("en-US")} shapes)`
 }
 
 function updateStatsText() {
-    document.getElementById("stats-text").innerHTML = `
+    get("stats-text").innerHTML = `
         Total Clicks: ${game.stats.totalClicks.toLocaleString("en-US")}<br>
         Total Shapes: ${game.stats.totalShapes.toLocaleString("en-US")}<br>
         Total Gilded Shapes: ${game.stats.totalGildedShapes.toLocaleString("en-US")}<br>
         Total Prestiges: ${game.stats.totalPrestige.toLocaleString("en-US")}<br>
         Shapes per Click: ${game.variables.shapesPerClick.toLocaleString("en-US")}<br>
         Ticks per Click: ${game.variables.ticksPerClick.toLocaleString("en-US")}<br>
-        Efficiency: ${game.variables.efficiency.toLocaleString("en-US")}<br><br>
+        Efficiency: ${game.variables.efficiency.toLocaleString("en-US")}<br>
+        Overclock Boost: ^${game.variables.overclockBoost.toLocaleString("en-US")}<br><br>
 
         Is altar unlocked? ${convertBoolToString(game.altar.altarUnlocked)}<br>
         Astral Shapes allocated: ${game.altar.totalAstralAllocated.toLocaleString("en-US")}<br>
@@ -222,13 +297,13 @@ function updateStatsText() {
 }
 
 function buyShopItem(item) {
-    if (game.resources.shapes < game.shop.costs[item]) return;
+    if (game.resources.shapes < game.shop.costs[item] || !(isFinite(game.shop.costs[item]))) return;
 
     game.resources.shapes -= game.shop.costs[item];
     if (!(game.shop.isExpensiveCost[item] ?? false)) game.shop.costs[item] *= game.shop.costIncrease
     else game.shop.costs[item] *= game.shop.costIncreaseExpensive
 
-    document.getElementById(`shop-${item}-cost`).innerHTML = `Cost: ${game.shop.costs[item].toLocaleString("en-US")} shapes`;
+    get(`shop-${item}-cost`).innerHTML = `Cost: ${game.shop.costs[item].toLocaleString("en-US")} shapes`;
 
     switch (item) {
         case 0:
@@ -243,9 +318,35 @@ function buyShopItem(item) {
         case 3:
             game.variables.shapesPerClick *= 2;
             break;
+        case 4:
+            game.variables.overclockBoost = (game.variables.overclockBoost * 100 + 5) / 100;
+            get("overclock-text").innerHTML = `Overclocking gives ^${game.variables.overclockBoost.toLocaleString("en-US")} shape gain for 30 seconds and has a cooldown of ${game.variables.overclockCooldown} seconds.`
+            if (Math.floor(game.variables.overclockBoost + 0.05) === 5) {
+                const btn = get("shop-4")
+                btn.disabled = true
+                btn.classList.remove("other-button")
+                btn.classList.add("disabled-button")
+                game.shop.costs[4] = Infinity
+                get(`shop-${item}-cost`).innerHTML = "This upgrade is maxed!"
+            }
+            break;
+        case 5:
+            game.variables.overclockCooldown -= 1
+            if (game.variables.overclockCooldown === 1) {
+                const btn = get("shop-5")
+                btn.disabled = true
+                btn.classList.remove("other-button")
+                btn.classList.add("disabled-button")
+                game.shop.costs[5] = Infinity
+                get(`shop-${item}-cost`).innerHTML = "This upgrade is maxed!"
+            }
+            get("overclock-text").innerHTML = `Overclocking gives ^${game.variables.overclockBoost.toLocaleString("en-US")} shape gain for 30 seconds and has a cooldown of ${game.variables.overclockCooldown} seconds.`
+            break;
     }
 
+    saveToLocalStorage()
     if (game.stats.statsOpen) updateStatsText();
+    updateShopButtons()
     updateShapeText();
 }
 
@@ -272,33 +373,37 @@ function prestige() {
     }
     if (game.stats.totalPrestige >= 5) {
         game.painting.paintingUnlocked = true;
-        document.getElementById("painting-button").innerHTML = "Painting";
+        get("painting-button").innerHTML = "Painting";
     }
 
-    document.getElementById("prestige-button").innerHTML = `Prestige (requires ${game.prestige.prestigeMin.toLocaleString("en-US")} shapes)`;
+    get("prestige-button").innerHTML = `Prestige (requires ${game.prestige.prestigeMin.toLocaleString("en-US")} shapes)`;
     if (!(game.achievements.unlocked[1])) gainAchievement(1);
     else if (game.resources.gildedShapes >= 10) gainAchievement(6);
+    for (let i=0;i<game.shop.costs.length;i++) {
+        get(`shop-${i}-cost`).innerHTML = `Cost: ${game.shop.costs[i].toLocaleString("en-US")} shapes`;
+    }
     updateShapeText();
+    updateShopButtons()
 }
 
 function toggleStats() {
     if (game.stats.statsOpen) {
-        document.getElementById("stats-text").innerHTML = "";
+        get("stats-text").innerHTML = "";
     } else updateStatsText();
     game.stats.statsOpen = !game.stats.statsOpen;
 }
 
 function toggleHelp() {
     if (game.stats.helpOpen) {
-        document.getElementById("help-text").innerHTML = "";
+        get("help-text").innerHTML = "";
     } else {
-        document.getElementById("help-text").innerHTML = `
+        get("help-text").innerHTML = `
         To get shapes, press the "generate shapes" button.<br>
         Once you have 10 shapes, you can increase the amount of shapes per click by 1.<br>
-        This will remove 10 shapes, and the cost of buying it again will double.<br><br>
+        This will cost 10 shapes, and the cost of buying it again will double.<br><br>
         
         Overclocking is a unique mechanic to increase your shape output.<br>
-        Every 40s, you can Overclock which raises your shape gain to the power of 1.5 (base).<br>
+        Every 40s, you can Overclock which raises your shape gain to the power of 1.2 (without any upgrades).<br>
         Some upgrades can increase this.<br><br>
         
         Efficiency increases your shape gain by 1 for each point you have.<br>
@@ -322,13 +427,13 @@ function toggleHelp() {
 function toggleAltar() {
     if (game.resources.gildedShapes >= 10) game.altar.altarUnlocked = true;
     if (!(game.altar.altarUnlocked)) {
-        document.getElementById("altar-button").innerHTML = "Altar (requires 10 Gilded Shapes)";
+        get("altar-button").innerHTML = "Altar (requires 10 Gilded Shapes)";
         alert("You need 10 Gilded Shapes to access the Altar!");
         return;
     }
 
     gainAchievement(7);
-    document.getElementById("altar-button").innerHTML = "Altar"
+    get("altar-button").innerHTML = "Altar"
     if (game.altar.altarOpen) {
         game.altar.altarDiv.style.display = 'none';
         game.divs.mainDiv.style.display = 'block';
@@ -344,7 +449,7 @@ function toggleAltar() {
 
 function convertShapes(type) {
     let amount = +prompt("How many shapes to convert?")
-    if (!(typeof amount === "number")) return;
+    if (!(typeof amount === "number") || isNaN(amount) || amount < 0 || !(isFinite(amount))) return;
 
     if (type === "astral") {
         if (game.resources.astralShapes < amount) {
@@ -371,7 +476,7 @@ function convertShapes(type) {
 function allocateAstralShapes(spell) {
     let spellName = game.altar.spells[spell];
     let amount = +prompt("How many Astral Shapes to allocate in the spell?")
-    if (amount === 0 || amount !== amount) return; // "amount !== amount" checks if amount is NaN
+    if (amount === 0 || !(isNaN(amount))) return;
 
     game.altar.totalAstralAllocated = 0;
     for (let i of game.altar.astralShapesAllocated) {
@@ -411,7 +516,7 @@ function togglePainting() {
         return;
     }
 
-    document.getElementById("painting-button").innerHTML = "Painting";
+    get("painting-button").innerHTML = "Painting";
     if (game.painting.paintingOpen) {
         game.divs.mainDiv.style.display = 'block'
         game.divs.paintingDiv.style.display = 'none'
@@ -481,26 +586,27 @@ function overclock() {
     game.variables.canOverclock = false;
     game.stats.overclockCount++;
     if (game.stats.overclockCount >= 25) gainAchievement(5)
-    document.getElementById("overclock-active").style.display = "block";
-    document.getElementById("overclock-button").disabled = true;
+    get("overclock-active").style.display = "block";
+    get("overclock-button").disabled = true;
     window.setTimeout(() => overclockCooldown(), 30000)
 }
 
 function overclockCooldown() {
-    game.variables.overclockTimer = 40;
+    game.variables.overclockTimer = game.variables.overclockCooldown;
     game.variables.overclocked = false;
-    document.getElementById("overclock-active").style.display = "none";
-    document.getElementById("overclock-cooldown").style.display = 'block'
+    get("overclock-active").style.display = "none";
+    get("overclock-cooldown").style.display = 'block'
+    get("overclock-cooldown").innerHTML = `Cooldown: ${game.variables.overclockTimer}s`;
     let timeoutId = window.setInterval(() => {
         if (game.variables.overclockTimer === 0) {
-            document.getElementById("overclock-cooldown").style.display = 'none'
-            document.getElementById("overclock-button").disabled = false;
+            get("overclock-cooldown").style.display = 'none'
+            get("overclock-button").disabled = false;
             game.variables.canOverclock = true;
             clearInterval(timeoutId);
             return;
         }
         game.variables.overclockTimer--;
-        document.getElementById("overclock-cooldown").innerHTML = `Cooldown: ${game.variables.overclockTimer}s`;
+        get("overclock-cooldown").innerHTML = `Cooldown: ${game.variables.overclockTimer}s`;
     }, 1000);
 }
 
@@ -529,26 +635,76 @@ function toggleAchievements() {
     if (game.achievements.achievementsOpen) {
         game.divs.achievementButtonDiv.style.display = "none";
         game.divs.mainDiv.style.display = "block";
-        document.getElementById("achievement-button").innerHTML = "Achievements"
+        get("achievement-button").innerHTML = "Achievements"
     } else {
         game.divs.achievementButtonDiv.style.display = "block";
         game.divs.mainDiv.style.display = "none";
-        document.getElementById("achievement-button").innerHTML = "Back"
+        get("achievement-button").innerHTML = "Back"
     }
     game.achievements.achievementsOpen = !game.achievements.achievementsOpen
 }
 
 function cheaterCheck() {if (game.stats.clicksInLastSecond > 20) gainAchievement(9); game.stats.clicksInLastSecond = 0}
 
+function saveToLocalStorage() {
+    for (let i=0;i<localStorageItems().length;i++) localStorage[localStorageItems()[i][0]] = JSON.stringify(localStorageItems()[i][1])
+}
+
+function loadFromLocalStorage() {
+    for (let i=0;i<localStorageItems().length;i++) {
+        let item = +localStorage.getItem(localStorageItems()[i][0]);
+        const keys = localStorageItems()[i][0].split("-");
+        console.log(keys)
+        if (keys[0] === "achievements") {
+            if (item === 1) gainAchievement(+keys[2])
+            continue
+        }
+        if (keys.length === 2) {
+            game[keys[0]][keys[1]] = item
+        } else if (keys.length === 3) {
+            game[keys[0]][keys[1]][keys[2]] = item
+        } else if (keys.length === 4) {
+            game[keys[0]][keys[1]][keys[2]][keys[3]] = item
+        } else console.log("uh oh: " + keys)
+    }
+    updateAllText()
+}
+
+function updateShopButtons() {
+    for (let i=0;i<game.shop.costs.length;i++) {
+        if (game.resources.shapes < game.shop.costs[i]) {
+            const btn = get("shop-"+i)
+            btn.disabled = true
+            btn.classList.remove("other-button")
+            btn.classList.add("disabled-button")
+        } else {
+            const btn = get("shop-"+i)
+            btn.disabled = false
+            btn.classList.remove("disabled-button")
+            btn.classList.add("other-button")
+        }
+    }
+}
+
 function hardReset() {
     if (!(confirm("Are you sure you want to hard reset?"))) return;
     if (!(confirm("This will erase EVERYTHING! Are you really sure?"))) return;
-    game = Object.assign({}, gameReset)
+    game = initGameObject()
+    game.achievements.unlocked = new Array(game.achievements.names.length).fill(false)
+    game.achievements.secretAchievementCount = game.achievements.descriptions.filter(x => x === "???").length
+    saveToLocalStorage()
+    updateAllText()
+    updateShopButtons()
+    for (let i=0;i<game.shop.costs.length;i++) {
+        get(`shop-${i}-cost`).innerHTML = `Cost: ${game.shop.costs[i].toLocaleString("en-US")} shapes`;
+    }
     alert("Reset your game!");
-    updateAllText();
 }
 const hax = () => gainAchievement(8);
 // SAVE SYSTEM WORK IN PROGRESS
+// bro what is this, why am I not using localStorage
+// now i am :)
+/*
 function exportSave() {
     let save = `${game.stats.totalClicks};_00a;${game.stats.totalShapes};${game.stats.totalGildedShapes};${game.stats.totalGildedShapes-7};${game.stats.totalPrestige};${game.resources.shapes};${game.resources.shapes+game.stats.totalPrestige}`
     console.log(save);
@@ -565,3 +721,4 @@ function importSave() {
     delete saveItems[4]
     delete saveItems[7]
 }
+*/
