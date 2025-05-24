@@ -170,6 +170,7 @@ game.achievements.secretAchievementCount = game.achievements.descriptions.filter
 document.body.onload = () => {
     get("modal").style.display = "block"
     get("modal-close").onclick = () => {get("modal").style.display = "none"}
+    if (+localStorage.getItem("stats-totalClicks") === 0 && +localStorage.getItem("stats-totalShapes") === 0) hardReset(false)
     if (!(navigator.cookieEnabled)) {
         const txt = document.createElement("p")
         txt.classList.add("main-text-mono")
@@ -612,6 +613,7 @@ function overclockCooldown() {
 
 function gainAchievement(id) {
     if (game.achievements.unlocked[id]) return;
+    console.log(id)
 
     const sortedId = game.achievements.sorted.achievements.findIndex(item => item === game.achievements.names[id]);
     game.divs.achievementDiv.style.display = 'block';
@@ -646,11 +648,12 @@ function toggleAchievements() {
 
 function cheaterCheck() {if (game.stats.clicksInLastSecond > 20) gainAchievement(9); game.stats.clicksInLastSecond = 0}
 
-function saveToLocalStorage() {
+function saveToLocalStorage(prompt = false) {
     for (let i=0;i<localStorageItems().length;i++) localStorage[localStorageItems()[i][0]] = JSON.stringify(localStorageItems()[i][1])
+    if (prompt) alert("Saved your game!")
 }
 
-function loadFromLocalStorage() {
+function loadFromLocalStorage(prompt = false) {
     for (let i=0;i<localStorageItems().length;i++) {
         let item = +localStorage.getItem(localStorageItems()[i][0]);
         const keys = localStorageItems()[i][0].split("-");
@@ -667,6 +670,7 @@ function loadFromLocalStorage() {
             game[keys[0]][keys[1]][keys[2]][keys[3]] = item
         } else console.log("uh oh: " + keys)
     }
+    if (prompt) alert("Saved your game!")
     updateAllText()
 }
 
@@ -686,9 +690,9 @@ function updateShopButtons() {
     }
 }
 
-function hardReset() {
-    if (!(confirm("Are you sure you want to hard reset?"))) return;
-    if (!(confirm("This will erase EVERYTHING! Are you really sure?"))) return;
+function hardReset(prompt = true) {
+    if (prompt && !(confirm("Are you sure you want to hard reset?"))) return;
+    if (prompt && !(confirm("This will erase EVERYTHING! Are you really sure?"))) return;
     game = initGameObject()
     game.achievements.unlocked = new Array(game.achievements.names.length).fill(false)
     game.achievements.secretAchievementCount = game.achievements.descriptions.filter(x => x === "???").length
@@ -698,7 +702,7 @@ function hardReset() {
     for (let i=0;i<game.shop.costs.length;i++) {
         get(`shop-${i}-cost`).innerHTML = `Cost: ${game.shop.costs[i].toLocaleString("en-US")} shapes`;
     }
-    alert("Reset your game!");
+    if (prompt) alert("Reset your game!");
 }
 const hax = () => gainAchievement(8);
 // SAVE SYSTEM WORK IN PROGRESS
