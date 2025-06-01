@@ -1,4 +1,24 @@
-[v1.1.2 (latest)]
+[v1.2 (latest)]
+[The Update That Makes The Game Slightly Less Awful]
++ Achievement banner is now displayed to the right of the main content, and doesn't shift main content down
++ Added 3 achievements (2 secret) (||The text for the achievement with the long name is a Limbus Company reference, by the way./|)
++ Added settings menu
++ Added importing and exporting save file to clipboard
++ Added border to help and stats menus
++ Added link to changelog in main game
++ Added more stats
+~ Fixed load button displaying incorrect message
+~ Moved altar-related currencies into main currencies div
+~ Overclock-related upgrades now scale more steeply
+~ Replaced most alerts with popup (confirmations and prompts remain)
+~ Moved save and load data buttons to new settings menu
+- Fixed maxed shop upgrades displaying as having NaN/Infinity cost
+- Removed emojis from achievement names and descriptions becaus btoa() doesn't like it (||"Tiny little hamster 😊" -> "Tiny little hamster :)"/|)
+- Deleted unsused TextEncoder() and TextDecoder() instances
+- Fixed being unable to ||allocate Astral Shapes to Spells/| and not checking for Infinity or NaN
+- Fixed setting instead of adding ||allocated Astral Shapes' Spell boost/|
+
+[v1.1.2]
 [The Update That Fixes Everything The Last Update Broke]
 + Fixed values being 0 when starting the game for the first time
 + Fixed achievements displaying as undefined
@@ -6,7 +26,7 @@
 
 [v1.1]
 [The Gigantic Bugfix Update]
-+ Finally started using localStorage!
++ Finally started using localStorage! 🥳
 + Added modal on load
 + Rounded corners of this div
 + Added clarification to some informative text
@@ -23,9 +43,12 @@
 - Fixed holding Enter counting as repeatedly clicking the Generate Shapes button
 - Fixed not updating shop cost text on prestige
 
-[v1]
+[v1.0.1]
 [The Update with Nothing Noteworthy]
 + Added 5th and 6th shop item
 + Added changelog
 ~ Nerfed Overclock boost from ^1.5 to ^1.2
 - Removed useless style from paint div
+
+[v1 - Release]
+(No patch notes, before the changelog was created there was many small updates, with nothing much each)

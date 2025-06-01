@@ -7,17 +7,25 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
+    <div class="achievement" id="alerts" style="display: none; float: right">
+        <div id="alerts-text"></div>
+    </div>
     <!-- Achievement popup -->
-    <div>
-        <div class="achievement" id="achievement-text">🙁 This page didn't load correctly. Please refresh! 🙁</div>
+    <div class="achievement" id="achievement-container" style="display: none; float: right">
+        <div id="achievement-text">
+           🙁 This page didn't load correctly. Please refresh! 🙁
+        </div>
     </div>
     <!-- Always visible text -->
     <div class="container">
         <p id="shapes-text" class="main-text-mono" style="font-size:15px">Shapes: 0</p>
         <p id="gilded-shapes-text" class="main-text-mono" style="font-size:15px">Gilded Shapes: 0</p>
+        <div id="altar-currencies">
+            <p id="astral-shapes-text" class="main-text-mono" style="font-size:15px">Astral Shapes: 0</p>
+            <p id="astral-shapes-available-text" class="main-text-mono" style="font-size:15px">Astral Shapes Available: 0</p>
+        </div>
     </div>
     <br>
-
     <div id="modal">
         <div class="modal-content">
             <span class="close-button main-text-mono" id="modal-close">&times;</span><br>
@@ -26,11 +34,12 @@
                 Thanks for playing my game!<br>
                 Just so you know, this uses localStorage to save your stats, so if you delete your cookies, your progress will be reset.<br>
                 Additionally, some browsers may have a setting to the effect of clearing cookies when closing a site, you will need to disable that too.<br>
+                This website requires clipboard permissions in order to import and export save data.<br>
                 This project is open-source, and you can review the code yourself to confirm that nothing malicious is happening.<br>
                 If you find any bugs, please inform me on GitHub.<br>
-                This project is fairly old, so there will no doubt be many bugs.<br>
+                This project is fairly old, so there will no doubt be many of them.<br>
             </p>
-            <a href="changelog.html" class="main-text-mono" style="font-size:15px" target="_blank">Click here to view the changelog!</a>
+            <a href="changelog.html" class="main-text-mono" style="font-size:20px" target="_blank">Click here to view the changelog!</a>
         </div>
     </div>
 
@@ -66,8 +75,6 @@
 
     <!-- Altar div -->
     <div id="altar">
-        <p id="astral-shapes-text" class="main-text-mono">Astral Shapes: 0</p>
-        <p id="astral-shapes-available-text" class="main-text-mono">Astral Shapes Available: 0</p>
         <button onclick="toggleAltar()" class="button other-button">Back</button>
         <br><br>
         <button onclick="convertShapes('gilded')" class="button shiny-button">Convert Gilded Shapes to Astral Shapes</button>
@@ -103,10 +110,24 @@
     <button onclick="toggleHelp()" class="button other-button">Help</button>
     <button onclick="toggleAchievements()" class="button other-button" id="achievement-button">Achievements</button>
     <br>
-    <button onclick="saveToLocalStorage(true)" class="button other-button">Save Data</button>
-    <button onclick="loadFromLocalStorage(true)" class="button other-button">Load Data</button>
-    <p id="stats-text" class="main-text-mono"></p>
-    <p id="help-text" class="main-text-mono"></p>
+    <button onclick="toggleSettings()" class="button other-button" id="settings-button">Settings</button><br>
+
+    <!-- Settings menu -->
+    <div id="settings" class="container" style="display:none;">
+        <p class="main-text-mono" style="font-size:20px">Settings</p>
+        <button onclick="saveToLocalStorage(true)" class="button other-button">Save Data</button>
+        <button onclick="loadFromLocalStorage(true)" class="button other-button">Load Data</button>
+        <br>
+        <button onclick="exportSave()" class="button other-button">Export Save File</button>
+        <button onclick="importSave()" class="button other-button">Import Save File From Clipboard</button>
+        <br>
+        <button onclick="alterSetting('autosave', !game.settings.autosave)" class="button other-button" id="settings-autosave">Autosave: Yes</button>
+        <br><br>
+        <button onclick="hardReset()" class="button danger-button">Hard Reset</button>
+    </div>
+
+    <p id="stats-text" class="main-text-mono container" style="display:none;"></p>
+    <p id="help-text" class="main-text-mono container" style="display:none;"></p>
 
     <!-- Filled by generateAchievementMatrix() -->
     <div id="achievements"></div>
@@ -115,9 +136,9 @@
     <a class="main-text-mono" onclick="gainAchievement(3)" target="_blank" href="https://plaza.dsolver.ca/m/AmazinDood">Incremental Plaza</a>
     <a class="main-text-mono" onclick="gainAchievement(3)" target="_blank" href="https://www.youtube.com/@SomeRandomGuyWithInternet">Youtube</a>
     <a class="main-text-mono" onclick="gainAchievement(3)" target="_blank" href="https://github.com/AmazinDooD">Github</a>
+    <br><br>
+    <a style="font-size:20px" class="main-text-mono" target="_blank" href="changelog.html">Changelog</a>
     <p style="text-align:right"><a href="images/hamster-spinning.gif" target="_blank" onclick="gainAchievement(4)"><img src="images/hamster-spinning.gif" alt="Spinning Hamster" width="10" height="10"></a></p>
-
-    <button onclick="hardReset()" class="button danger-button">Hard Reset</button>
     <script src="init.js"></script>
     <script src="standard notation table.js"></script> <!-- useless :) -->
 </body>

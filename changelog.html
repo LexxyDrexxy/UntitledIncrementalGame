@@ -19,10 +19,25 @@
             text-align: center;
             border-radius: 10px;
         }
+        .spoiler {
+            color: transparent;
+            background-color: #9dff9d;
+            border-radius: 5px;
+            transition-duration: 0.25s;
+            user-select: none;
+        }
+        .spoiler:hover {
+            background-color: transparent;
+            color: #004300
+        }
     </style>
 </head>
 <body>
-<div class="changelog"></div>
+<div class="changelog" style="float: right; position: sticky; top: -2px; width: 25%; font-size: 20px;">
+    These are spoilers, hover to reveal them:<br>
+    <span class="spoiler">ooh spooky</span>
+</div>
+<div class="changelog" id="main-changelog"></div>
 <script>
 fetch("changelog.txt")
 .then(response => response.text())
@@ -30,7 +45,9 @@ fetch("changelog.txt")
     text = text.replaceAll("\n", "<br>");
     text = text.replaceAll("[", "<b style='font-size:20px; color:#256c00'>");
     text = text.replaceAll("]", "</b>");
-    document.querySelector("div.changelog").innerHTML = text
+    text = text.replaceAll("||", "<span class='spoiler'>");
+    text = text.replaceAll("/|", "</span>")
+    document.querySelector("#main-changelog").innerHTML = text
 })
 .catch(error => console.log("oops :(\n",error));
 </script>
